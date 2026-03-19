@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>둔둔맘 릴스 제작소</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F8F4EF; --surface: #FDFAF6; --rose: #E07B6A; --rose-deep: #C45F4E;
+  --rose-light: #F5DDD8; --sage: #7DA882; --sage-deep: #4E7A53; --sage-light: #D8EBD9;
+  --amber: #D4956A; --amber-light: #F5E4D4; --ink: #2A2522; --ink-mid: #6B6460;
+  --ink-light: #B0AAA6; --border: #E8E2DC; --purple: #8B7BAF; --purple-light: #EAE5F5;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--ink); font-family:'Noto Sans KR',sans-serif; min-height:100vh; }
+.app { max-width:860px; margin:0 auto; padding:48px 20px 100px; }
+.header { text-align:center; margin-bottom:44px; }
+.header-eyebrow { display:inline-flex; align-items:center; gap:6px; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--rose); border:1px solid var(--rose-light); padding:5px 14px; border-radius:20px; margin-bottom:18px; }
+.header h1 { font-family:'Noto Serif KR',serif; font-size:clamp(28px,5vw,42px); font-weight:900; line-height:1.2; margin-bottom:10px; }
+.header h1 em { font-style:normal; color:var(--rose); }
+.header p { font-size:14px; color:var(--ink-mid); line-height:1.8; }
+.panel { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:32px; margin-bottom:32px; box-shadow:0 2px 20px rgba(0,0,0,0.04); }
+.panel-label { font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:var(--ink-light); font-weight:600; margin-bottom:14px; }
+.cat-wrap { display:flex; flex-wrap:wrap; gap:9px; margin-bottom:28px; }
+.cat-btn { display:flex; align-items:center; gap:6px; padding:8px 16px; border-radius:40px; border:1.5px solid var(--border); background:transparent; font-family:'Noto Sans KR',sans-serif; font-size:13px; font-weight:500; color:var(--ink-mid); cursor:pointer; transition:all .18s; }
+.cat-btn:hover { border-color:var(--rose); color:var(--rose); }
+.cat-btn.on { background:var(--rose); border-color:var(--rose); color:#fff; }
+.count-row { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
+.count-row span { font-size:13px; color:var(--ink-mid); }
+.count-dots { display:flex; gap:7px; }
+.count-dot { width:34px; height:34px; border-radius:50%; border:1.5px solid var(--border); background:transparent; font-family:'Noto Sans KR',sans-serif; font-size:13px; font-weight:600; color:var(--ink-mid); cursor:pointer; transition:all .18s; display:flex; align-items:center; justify-content:center; }
+.count-dot.on { background:var(--sage); border-color:var(--sage); color:#fff; }
+textarea.hint-input { width:100%; min-height:64px; padding:12px 16px; border:1.5px solid var(--border); border-radius:12px; background:var(--bg); font-family:'Noto Sans KR',sans-serif; font-size:13px; color:var(--ink); outline:none; resize:vertical; transition:border-color .18s; margin-bottom:24px; }
+textarea.hint-input:focus { border-color:var(--rose); }
+textarea.hint-input::placeholder { color:var(--ink-light); }
+.gen-btn { width:100%; padding:17px; background:linear-gradient(135deg,var(--rose-deep),var(--rose)); color:#fff; border:none; border-radius:14px; font-family:'Noto Serif KR',serif; font-size:16px; font-weight:700; cursor:pointer; transition:all .22s; box-shadow:0 6px 24px rgba(196,95,78,.28); display:flex; align-items:center; justify-content:center; gap:10px; }
+.gen-btn:hover { transform:translateY(-2px); }
+.gen-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+.spin { width:18px; height:18px; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; display:none; }
+.results { display:none; }
+.results-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.results-top h2 { font-family:'Noto Serif KR',serif; font-size:22px; font-weight:700; }
+.copy-all { padding:7px 16px; border:1.5px solid var(--sage); background:transparent; color:var(--sage-deep); border-radius:20px; font-family:'Noto Sans KR',sans-serif; font-size:12px; font-weight:500; cursor:pointer; transition:all .18s; }
+.copy-all:hover { background:var(--sage); color:#fff; }
+.reel-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; margin-bottom:28px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.05); }
+.card-head { display:flex; align-items:center; padding:18px 24px; border-bottom:1px solid var(--border); background:linear-gradient(135deg,var(--bg),var(--surface)); gap:12px; }
+.num-badge { width:30px; height:30px; background:var(--rose); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; }
+.card-title { font-weight:600; font-size:15px; }
+.card-cat { font-size:11px; color:var(--ink-mid); background:var(--border); padding:3px 10px; border-radius:10px; }
+.tab-bar { display:flex; border-bottom:1px solid var(--border); padding:0 24px; overflow-x:auto; }
+.tab-bar::-webkit-scrollbar { display:none; }
+.tab { padding:13px 16px; font-size:12px; font-weight:500; color:var(--ink-mid); border:none; background:transparent; font-family:'Noto Sans KR',sans-serif; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; transition:all .18s; margin-bottom:-1px; }
+.tab:hover { color:var(--rose); }
+.tab.active { color:var(--rose); border-bottom-color:var(--rose); }
+.tab-content { padding:24px; }
+.tab-pane { display:none; }
+.tab-pane.active { display:block; }
+.script-block { margin-bottom:20px; }
+.block-label { font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:var(--rose); font-weight:700; margin-bottom:8px; }
+.hook-box { font-family:'Noto Serif KR',serif; font-size:17px; font-weight:700; line-height:1.6; border-left:3px solid var(--rose); padding:12px 16px; background:var(--rose-light); border-radius:0 10px 10px 0; }
+.cut-line { padding:9px 0; border-bottom:1px solid var(--border); }
+.cut-line:last-child { border-bottom:none; }
+.cut-text { font-size:14px; line-height:1.7; color:var(--ink); font-weight:500; }
+.cta-box { background:var(--sage-light); border-radius:10px; padding:12px 16px; font-size:14px; font-weight:600; color:var(--sage-deep); }
+.cut-guide-table { width:100%; border-collapse:collapse; }
+.cut-guide-table th { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-light); text-align:left; padding:8px 12px; border-bottom:1.5px solid var(--border); }
+.cut-guide-table td { padding:11px 12px; vertical-align:top; border-bottom:1px solid var(--border); font-size:13px; line-height:1.6; }
+.cut-guide-table tr:last-child td { border-bottom:none; }
+.cut-num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; background:var(--amber-light); color:var(--amber); border-radius:50%; font-size:11px; font-weight:700; }
+.pexels-tag { display:inline-block; background:var(--purple-light); color:var(--purple); font-size:11px; padding:2px 9px; border-radius:10px; margin:2px 3px 2px 0; }
+.source-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+.source-item:last-child { border-bottom:none; }
+.source-icon { width:32px; height:32px; background:var(--amber-light); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.source-body { flex:1; }
+.source-name { font-size:13px; font-weight:600; margin-bottom:3px; }
+.source-desc { font-size:12px; color:var(--ink-mid); line-height:1.6; margin-bottom:5px; }
+.source-link { font-size:11px; color:var(--rose); text-decoration:none; word-break:break-all; }
+.source-link:hover { text-decoration:underline; }
+.notion-box { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:20px; font-size:13px; line-height:1.9; white-space:pre-wrap; color:var(--ink); }
+.notion-copy-btn { display:flex; align-items:center; gap:6px; margin-top:14px; padding:9px 18px; border:1.5px solid var(--border); background:transparent; color:var(--ink-mid); border-radius:20px; font-family:'Noto Sans KR',sans-serif; font-size:12px; font-weight:500; cursor:pointer; transition:all .18s; }
+.notion-copy-btn:hover { border-color:var(--sage); color:var(--sage-deep); }
+.notion-copy-btn.copied { background:var(--sage); border-color:var(--sage); color:#fff; }
+.loading-box { text-align:center; padding:56px 20px; }
+.loading-emoji { font-size:38px; display:block; margin-bottom:14px; animation:bounce 1s ease infinite; }
+.loading-box p { font-size:15px; color:var(--ink-mid); }
+.loading-box small { font-size:12px; color:var(--ink-light); margin-top:6px; display:block; }
+.err-box { background:#FFF5F5; border:1px solid #FECACA; border-radius:12px; padding:16px 20px; font-size:14px; color:#991B1B; }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+.footer { text-align:center; margin-top:60px; font-size:12px; color:var(--ink-light); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-eyebrow">✦ 둔둔맘 전용</div>
+    <h1>릴스 <em>제작소</em></h1>
+    <p>소재부터 대본, 컷 가이드, 근거 자료, 노션 배포본까지<br>버튼 하나로 한 번에.</p>
+  </div>
+  <div class="panel">
+    <div class="panel-label">카테고리</div>
+    <div class="cat-wrap" id="catWrap">
+      <button class="cat-btn on" data-cat="신생아/영아 육아">👶 신생아/영아</button>
+      <button class="cat-btn" data-cat="유아 발달/교육">🧠 유아 발달/교육</button>
+      <button class="cat-btn" data-cat="육아 제품/추천">🛍️ 제품 추천</button>
+      <button class="cat-btn" data-cat="수면/수면교육">😴 수면교육</button>
+      <button class="cat-btn" data-cat="이유식/영양">🥣 이유식/영양</button>
+      <button class="cat-btn" data-cat="엄마 건강/멘탈">💆 엄마 건강</button>
+      <button class="cat-btn" data-cat="출산/육아 정책">📋 정부 정책/혜택</button>
+    </div>
+    <div class="panel-label">이번 주 생성 개수</div>
+    <div class="count-row">
+      <div class="count-dots" id="countDots">
+        <button class="count-dot on" data-n="1">1</button>
+        <button class="count-dot on" data-n="2">2</button>
+        <button class="count-dot" data-n="3">3</button>
+        <button class="count-dot" data-n="4">4</button>
+      </div>
+      <span>개</span>
+    </div>
+    <div class="panel-label">추가 방향 (선택)</div>
+    <textarea class="hint-input" id="hint" placeholder="예: 요즘 밤수 때문에 힘든 엄마들 많아서 수면 관련으로 / 4~6개월 아기 위주"></textarea>
+    <button class="gen-btn" id="genBtn" onclick="generate()">
+      <div class="spin" id="spin"></div>
+      <span id="btnTxt">✨ 이번 주 릴스 만들기</span>
+    </button>
+  </div>
+  <div class="results" id="results">
+    <div class="results-top">
+      <h2>📋 이번 주 릴스</h2>
+      <button class="copy-all" onclick="copyAll()">전체 복사</button>
+    </div>
+    <div id="reelsWrap"></div>
+  </div>
+  <div class="footer">둔둔맘 릴스 제작소 🌸</div>
+</div>
+<script>
+let selCats=['신생아/영아 육아'],selCount=2,allData=[];
+document.querySelectorAll('.cat-btn').forEach(b=>{b.addEventListener('click',()=>{const c=b.dataset.cat;if(b.classList.contains('on')){if(selCats.length===1)return;b.classList.remove('on');selCats=selCats.filter(x=>x!==c);}else{b.classList.add('on');selCats.push(c);}});});
+document.querySelectorAll('.count-dot').forEach(b=>{b.addEventListener('click',()=>{selCount=+b.dataset.n;document.querySelectorAll('.count-dot').forEach(d=>d.classList.toggle('on',+d.dataset.n<=selCount));});});
+async function generate(){
+  const btn=document.getElementById('genBtn'),spin=document.getElementById('spin'),btnTxt=document.getElementById('btnTxt'),results=document.getElementById('results'),wrap=document.getElementById('reelsWrap');
+  btn.disabled=true;spin.style.display='block';btnTxt.textContent='생성 중...';
+  results.style.display='block';
+  wrap.innerHTML='<div class="loading-box"><span class="loading-emoji">✍️</span><p>릴스 대본 작성 중이에요</p><small>소재 탐색 → 대본 작성 → 컷 가이드 → 근거 수집...</small></div>';
+  results.scrollIntoView({behavior:'smooth',block:'start'});
+  const hint=document.getElementById('hint').value.trim();
+  const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
+  const prompt=`당신은 한국 육아 인플루언서 "둔둔맘"의 전담 콘텐츠 전략가입니다.\n오늘 날짜: ${today}\n선택 카테고리: ${selCats.join(', ')}\n생성 개수: ${selCount}개\n${hint?`추가 방향: ${hint}`:''}\n\n[둔둔맘 릴스 대본 스타일 규칙]\n- 줄 = 컷: 한 줄이 영상 1컷 전환 기준. 2~4단어로 짧게 끊기\n- 7단계 구조: 타이틀 → 후킹 → 공감/문제제기 → 권위/신뢰 → 번호 본문(행동+이유 줄바꿈) → 긴급성 → 댓글CTA\n- 톤: 전문가적이되 엄마끼리 대화하는 느낌. "~잖아요", "~드라구요", "~된대요"\n- 후킹: "이거 절대 하지 마세요", "이거 몰라서 많이 실수하시더라구요" 류\n- 본문: 항목명(짧게) 다음 줄에 이유/결과 (번호 1·2·3 형식)\n- CTA: 키워드 댓글 유도 ("○○" 댓글 달면 바로 전송)\n\n각 릴스마다 아래 JSON 구조로만 응답. 다른 텍스트 없이 JSON만:\n\n{"reels":[{"title":"릴스 제목","category":"카테고리","why_now":"지금 이 소재를 써야 하는 이유 1~2문장","script":[{"step":"타이틀","lines":["줄1","줄2"]},{"step":"후킹","lines":["줄1"]},{"step":"공감","lines":["줄1","줄2","줄3"]},{"step":"신뢰","lines":["줄1"]},{"step":"본문","lines":["1. 항목명","이유/결과","2. 항목명","이유/결과","3. 항목명","이유/결과"]},{"step":"긴급성","lines":["줄1","줄2"]},{"step":"CTA","lines":["줄1","줄2"]}],"cut_guide":[{"line":"대본 줄","clip":"영상 장면 묘사","pexels":["검색어1","검색어2"]}],"sources":[{"name":"출처명","desc":"참고 내용 한 줄","url":"https://..."}],"notion_export":"노션 배포용 텍스트. ## 소제목, • 불릿 형태. 이모지 활용.","cta_keyword":"댓글 키워드"}]}`;
+  try{
+    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const raw=data.content.map(i=>i.text||'').join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    allData=parsed.reels;
+    renderReels(parsed.reels);
+  }catch(e){wrap.innerHTML=`<div class="err-box">⚠️ 오류가 났어요. 잠시 후 다시 시도해주세요.<br><small>${e.message}</small></div>`;}
+  btn.disabled=false;spin.style.display='none';btnTxt.textContent='✨ 이번 주 릴스 만들기';
+}
+function renderReels(reels){
+  const wrap=document.getElementById('reelsWrap');wrap.innerHTML='';
+  const stepColors={'타이틀':'var(--rose)','후킹':'var(--amber)','공감':'var(--sage)','신뢰':'var(--purple)','본문':'var(--rose)','긴급성':'var(--ink-mid)','CTA':'var(--sage)'};
+  reels.forEach((r,i)=>{
+    const card=document.createElement('div');card.className='reel-card';
+    let scriptHTML='';
+    r.script.forEach(s=>{
+      if(s.step==='후킹'){scriptHTML+=`<div class="script-block"><div class="block-label">⚡ 후킹</div><div class="hook-box">${s.lines.join('<br>')}</div></div>`;}
+      else if(s.step==='CTA'){scriptHTML+=`<div class="script-block"><div class="block-label">👉 CTA</div><div class="cta-box">${s.lines.join('<br>')}</div></div>`;}
+      else{const dot=`<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${stepColors[s.step]||'var(--rose)'};margin-right:6px;vertical-align:middle"></span>`;scriptHTML+=`<div class="script-block"><div class="block-label">${dot}${s.step}</div><div class="script-lines">${s.lines.map(l=>`<div class="cut-line"><div class="cut-text">${l}</div></div>`).join('')}</div></div>`;}
+    });
+    let cutHTML=`<table class="cut-guide-table"><tr><th>#</th><th>대본 줄</th><th>영상 묘사</th><th>Pexels 검색어</th></tr>`;
+    r.cut_guide.forEach((c,ci)=>{cutHTML+=`<tr><td><span class="cut-num">${ci+1}</span></td><td>${c.line}</td><td>${c.clip}</td><td>${(c.pexels||[]).map(k=>`<span class="pexels-tag">${k}</span>`).join('')}</td></tr>`;});
+    cutHTML+='</table>';
+    const srcIcons=['📄','🔬','🏛️','📰','📊'];
+    let srcHTML=r.sources.map((s,si)=>`<div class="source-item"><div class="source-icon">${srcIcons[si%srcIcons.length]}</div><div class="source-body"><div class="source-name">${s.name}</div><div class="source-desc">${s.desc}</div><a class="source-link" href="${s.url}" target="_blank">${s.url}</a></div></div>`).join('');
+    const nid=`notion-${i}`;
+    card.innerHTML=`<div class="card-head"><div class="num-badge">${i+1}</div><span class="card-title">${r.title}</span><span class="card-cat">${r.category}</span></div><div class="tab-bar" id="tabbar-${i}"><button class="tab active" onclick="switchTab(${i},'script',this)">📝 대본</button><button class="tab" onclick="switchTab(${i},'cut',this)">🎬 컷 가이드</button><button class="tab" onclick="switchTab(${i},'source',this)">📚 근거 자료</button><button class="tab" onclick="switchTab(${i},'notion',this)">📎 노션 배포본</button></div><div class="tab-content"><div id="pane-${i}-script" class="tab-pane active"><div style="background:var(--amber-light);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--amber);line-height:1.7">💡 <strong>지금 이 소재인 이유</strong><br>${r.why_now}</div>${scriptHTML}</div><div id="pane-${i}-cut" class="tab-pane">${cutHTML}</div><div id="pane-${i}-source" class="tab-pane">${srcHTML}</div><div id="pane-${i}-notion" class="tab-pane"><div class="notion-box" id="${nid}">${r.notion_export||''}</div><button class="notion-copy-btn" onclick="copyNotion('${nid}',this)">📋 노션에 복사하기</button></div></div>`;
+    wrap.appendChild(card);
+  });
+}
+function switchTab(idx,pane,btn){['script','cut','source','notion'].forEach(p=>document.getElementById(`pane-${idx}-${p}`).classList.toggle('active',p===pane));document.querySelectorAll(`#tabbar-${idx} .tab`).forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+function copyNotion(id,btn){navigator.clipboard.writeText(document.getElementById(id).innerText).then(()=>{btn.classList.add('copied');btn.textContent='✅ 복사 완료!';setTimeout(()=>{btn.classList.remove('copied');btn.textContent='📋 노션에 복사하기';},2000);});}
+function copyAll(){if(!allData.length)return;const txt=allData.map((r,i)=>`=== 릴스 ${i+1}: ${r.title} ===\n\n${r.script.flatMap(s=>s.lines).join('\n')}\n\nCTA: "${r.cta_keyword}"`).join('\n\n'+'─'.repeat(30)+'\n\n');navigator.clipboard.writeText(txt).then(()=>{const b=document.querySelector('.copy-all');b.textContent='✅ 복사됨!';setTimeout(()=>b.textContent='전체 복사',2000);});}
+</script>
+</body>
+</html>
