@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -20,6 +21,33 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans KR',sans-s
 .header h1 { font-family:'Noto Serif KR',serif; font-size:clamp(28px,5vw,42px); font-weight:900; line-height:1.2; margin-bottom:10px; }
 .header h1 em { font-style:normal; color:var(--rose); }
 .header p { font-size:14px; color:var(--ink-mid); line-height:1.8; }
+
+/* API Key Setup */
+.apikey-panel {
+  background:var(--surface); border:1.5px solid var(--rose-light);
+  border-radius:20px; padding:32px; margin-bottom:32px;
+  box-shadow:0 2px 20px rgba(0,0,0,0.04);
+}
+.apikey-panel h3 { font-family:'Noto Serif KR',serif; font-size:18px; font-weight:700; margin-bottom:8px; }
+.apikey-panel p { font-size:13px; color:var(--ink-mid); line-height:1.7; margin-bottom:18px; }
+.apikey-row { display:flex; gap:10px; }
+.apikey-input {
+  flex:1; padding:12px 16px;
+  border:1.5px solid var(--border); border-radius:12px;
+  background:var(--bg); font-family:'Noto Sans KR',sans-serif;
+  font-size:13px; color:var(--ink); outline:none; transition:border-color .18s;
+}
+.apikey-input:focus { border-color:var(--rose); }
+.apikey-save {
+  padding:12px 20px; background:var(--rose); color:#fff;
+  border:none; border-radius:12px; font-family:'Noto Sans KR',sans-serif;
+  font-size:13px; font-weight:600; cursor:pointer; transition:all .18s; white-space:nowrap;
+}
+.apikey-save:hover { background:var(--rose-deep); }
+.apikey-status { font-size:12px; margin-top:10px; }
+.apikey-status.ok { color:var(--sage-deep); }
+.apikey-status.err { color:#991B1B; }
+
 .panel { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:32px; margin-bottom:32px; box-shadow:0 2px 20px rgba(0,0,0,0.04); }
 .panel-label { font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:var(--ink-light); font-weight:600; margin-bottom:14px; }
 .cat-wrap { display:flex; flex-wrap:wrap; gap:9px; margin-bottom:28px; }
@@ -98,6 +126,19 @@ textarea.hint-input::placeholder { color:var(--ink-light); }
     <h1>릴스 <em>제작소</em></h1>
     <p>소재부터 대본, 컷 가이드, 근거 자료, 노션 배포본까지<br>버튼 하나로 한 번에.</p>
   </div>
+
+  <!-- API Key Panel -->
+  <div class="apikey-panel" id="apikeyPanel">
+    <h3>🔑 API 키 설정</h3>
+    <p>처음 한 번만 입력하면 돼요. 브라우저에 저장되어서 다음에는 안 물어봐요.<br>
+    API 키는 <strong>console.anthropic.com</strong> → API Keys에서 확인할 수 있어요.</p>
+    <div class="apikey-row">
+      <input class="apikey-input" id="apikeyInput" type="password" placeholder="sk-ant-..."/>
+      <button class="apikey-save" onclick="saveApiKey()">저장</button>
+    </div>
+    <div class="apikey-status" id="apikeyStatus"></div>
+  </div>
+
   <div class="panel">
     <div class="panel-label">카테고리</div>
     <div class="cat-wrap" id="catWrap">
@@ -126,6 +167,7 @@ textarea.hint-input::placeholder { color:var(--ink-light); }
       <span id="btnTxt">✨ 이번 주 릴스 만들기</span>
     </button>
   </div>
+
   <div class="results" id="results">
     <div class="results-top">
       <h2>📋 이번 주 릴스</h2>
@@ -133,13 +175,47 @@ textarea.hint-input::placeholder { color:var(--ink-light); }
     </div>
     <div id="reelsWrap"></div>
   </div>
+
   <div class="footer">둔둔맘 릴스 제작소 🌸</div>
 </div>
+
 <script>
 let selCats=['신생아/영아 육아'],selCount=2,allData=[];
+
+// API Key
+function saveApiKey(){
+  const key=document.getElementById('apikeyInput').value.trim();
+  if(!key.startsWith('sk-ant-')){
+    document.getElementById('apikeyStatus').textContent='❌ 올바른 API 키가 아니에요. sk-ant- 로 시작해야 해요.';
+    document.getElementById('apikeyStatus').className='apikey-status err';
+    return;
+  }
+  localStorage.setItem('anthropic_key',key);
+  document.getElementById('apikeyStatus').textContent='✅ 저장됐어요! 이제 릴스 만들기 버튼을 눌러보세요.';
+  document.getElementById('apikeyStatus').className='apikey-status ok';
+  document.getElementById('apikeyPanel').style.borderColor='var(--sage-light)';
+}
+
+// Load saved key
+window.addEventListener('load',()=>{
+  const saved=localStorage.getItem('anthropic_key');
+  if(saved){
+    document.getElementById('apikeyInput').value=saved;
+    document.getElementById('apikeyStatus').textContent='✅ 저장된 API 키가 있어요.';
+    document.getElementById('apikeyStatus').className='apikey-status ok';
+    document.getElementById('apikeyPanel').style.borderColor='var(--sage-light)';
+  }
+});
+
 document.querySelectorAll('.cat-btn').forEach(b=>{b.addEventListener('click',()=>{const c=b.dataset.cat;if(b.classList.contains('on')){if(selCats.length===1)return;b.classList.remove('on');selCats=selCats.filter(x=>x!==c);}else{b.classList.add('on');selCats.push(c);}});});
 document.querySelectorAll('.count-dot').forEach(b=>{b.addEventListener('click',()=>{selCount=+b.dataset.n;document.querySelectorAll('.count-dot').forEach(d=>d.classList.toggle('on',+d.dataset.n<=selCount));});});
+
 async function generate(){
+  const apiKey=localStorage.getItem('anthropic_key');
+  if(!apiKey){
+    alert('먼저 API 키를 입력하고 저장해주세요!');
+    return;
+  }
   const btn=document.getElementById('genBtn'),spin=document.getElementById('spin'),btnTxt=document.getElementById('btnTxt'),results=document.getElementById('results'),wrap=document.getElementById('reelsWrap');
   btn.disabled=true;spin.style.display='block';btnTxt.textContent='생성 중...';
   results.style.display='block';
@@ -149,16 +225,18 @@ async function generate(){
   const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
   const prompt=`당신은 한국 육아 인플루언서 "둔둔맘"의 전담 콘텐츠 전략가입니다.\n오늘 날짜: ${today}\n선택 카테고리: ${selCats.join(', ')}\n생성 개수: ${selCount}개\n${hint?`추가 방향: ${hint}`:''}\n\n[둔둔맘 릴스 대본 스타일 규칙]\n- 줄 = 컷: 한 줄이 영상 1컷 전환 기준. 2~4단어로 짧게 끊기\n- 7단계 구조: 타이틀 → 후킹 → 공감/문제제기 → 권위/신뢰 → 번호 본문(행동+이유 줄바꿈) → 긴급성 → 댓글CTA\n- 톤: 전문가적이되 엄마끼리 대화하는 느낌. "~잖아요", "~드라구요", "~된대요"\n- 후킹: "이거 절대 하지 마세요", "이거 몰라서 많이 실수하시더라구요" 류\n- 본문: 항목명(짧게) 다음 줄에 이유/결과 (번호 1·2·3 형식)\n- CTA: 키워드 댓글 유도 ("○○" 댓글 달면 바로 전송)\n\n각 릴스마다 아래 JSON 구조로만 응답. 다른 텍스트 없이 JSON만:\n\n{"reels":[{"title":"릴스 제목","category":"카테고리","why_now":"지금 이 소재를 써야 하는 이유 1~2문장","script":[{"step":"타이틀","lines":["줄1","줄2"]},{"step":"후킹","lines":["줄1"]},{"step":"공감","lines":["줄1","줄2","줄3"]},{"step":"신뢰","lines":["줄1"]},{"step":"본문","lines":["1. 항목명","이유/결과","2. 항목명","이유/결과","3. 항목명","이유/결과"]},{"step":"긴급성","lines":["줄1","줄2"]},{"step":"CTA","lines":["줄1","줄2"]}],"cut_guide":[{"line":"대본 줄","clip":"영상 장면 묘사","pexels":["검색어1","검색어2"]}],"sources":[{"name":"출처명","desc":"참고 내용 한 줄","url":"https://..."}],"notion_export":"노션 배포용 텍스트. ## 소제목, • 불릿 형태. 이모지 활용.","cta_keyword":"댓글 키워드"}]}`;
   try{
-    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
+    if(data.error){throw new Error(data.error.message);}
     const raw=data.content.map(i=>i.text||'').join('');
     const clean=raw.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(clean);
     allData=parsed.reels;
     renderReels(parsed.reels);
-  }catch(e){wrap.innerHTML=`<div class="err-box">⚠️ 오류가 났어요. 잠시 후 다시 시도해주세요.<br><small>${e.message}</small></div>`;}
+  }catch(e){wrap.innerHTML=`<div class="err-box">⚠️ 오류가 났어요. API 키를 확인해주세요.<br><small>${e.message}</small></div>`;}
   btn.disabled=false;spin.style.display='none';btnTxt.textContent='✨ 이번 주 릴스 만들기';
 }
+
 function renderReels(reels){
   const wrap=document.getElementById('reelsWrap');wrap.innerHTML='';
   const stepColors={'타이틀':'var(--rose)','후킹':'var(--amber)','공감':'var(--sage)','신뢰':'var(--purple)','본문':'var(--rose)','긴급성':'var(--ink-mid)','CTA':'var(--sage)'};
