@@ -1,11 +1,11 @@
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+exports.handler = async function(event) {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
+    return { statusCode: 500, body: JSON.stringify({ error: 'API key not configured' }) };
   }
 
   try {
@@ -16,12 +16,18 @@ export default async function handler(req, res) {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify(req.body)
+      body: event.body
     });
-
     const data = await response.json();
-    return res.status(200).json(data);
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify(data)
+    };
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
-}
+};
