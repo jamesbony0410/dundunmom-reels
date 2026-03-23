@@ -20,17 +20,6 @@ body { background:var(--bg); color:var(--ink); font-family:'Noto Sans KR',sans-s
 .header h1 { font-family:'Noto Serif KR',serif; font-size:clamp(28px,5vw,42px); font-weight:900; line-height:1.2; margin-bottom:10px; }
 .header h1 em { font-style:normal; color:var(--rose); }
 .header p { font-size:14px; color:var(--ink-mid); line-height:1.8; }
-.apikey-panel { background:var(--surface); border:1.5px solid var(--rose-light); border-radius:20px; padding:32px; margin-bottom:32px; box-shadow:0 2px 20px rgba(0,0,0,0.04); }
-.apikey-panel h3 { font-family:'Noto Serif KR',serif; font-size:18px; font-weight:700; margin-bottom:8px; }
-.apikey-panel p { font-size:13px; color:var(--ink-mid); line-height:1.7; margin-bottom:18px; }
-.apikey-row { display:flex; gap:10px; }
-.apikey-input { flex:1; padding:12px 16px; border:1.5px solid var(--border); border-radius:12px; background:var(--bg); font-family:'Noto Sans KR',sans-serif; font-size:13px; color:var(--ink); outline:none; transition:border-color .18s; }
-.apikey-input:focus { border-color:var(--rose); }
-.apikey-save { padding:12px 20px; background:var(--rose); color:#fff; border:none; border-radius:12px; font-family:'Noto Sans KR',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:all .18s; white-space:nowrap; }
-.apikey-save:hover { background:var(--rose-deep); }
-.apikey-status { font-size:12px; margin-top:10px; }
-.apikey-status.ok { color:var(--sage-deep); }
-.apikey-status.err { color:#991B1B; }
 .panel { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:32px; margin-bottom:32px; box-shadow:0 2px 20px rgba(0,0,0,0.04); }
 .panel-label { font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:var(--ink-light); font-weight:600; margin-bottom:14px; }
 .cat-wrap { display:flex; flex-wrap:wrap; gap:9px; margin-bottom:28px; }
@@ -109,15 +98,6 @@ textarea.hint-input::placeholder { color:var(--ink-light); }
     <h1>릴스 <em>제작소</em></h1>
     <p>소재부터 대본, 컷 가이드, 근거 자료, 노션 배포본까지<br>버튼 하나로 한 번에.</p>
   </div>
-  <div class="apikey-panel" id="apikeyPanel">
-    <h3>🔑 API 키 설정</h3>
-    <p>처음 한 번만 입력하면 돼요. 브라우저에 저장되어서 다음에는 안 물어봐요.<br>API 키는 <strong>console.anthropic.com</strong> → API Keys에서 확인할 수 있어요.</p>
-    <div class="apikey-row">
-      <input class="apikey-input" id="apikeyInput" type="password" placeholder="sk-ant-..."/>
-      <button class="apikey-save" onclick="saveApiKey()">저장</button>
-    </div>
-    <div class="apikey-status" id="apikeyStatus"></div>
-  </div>
   <div class="panel">
     <div class="panel-label">카테고리</div>
     <div class="cat-wrap" id="catWrap">
@@ -157,27 +137,6 @@ textarea.hint-input::placeholder { color:var(--ink-light); }
 </div>
 <script>
 let selCats=['신생아/영아 육아'],selCount=2,allData=[];
-function saveApiKey(){
-  const key=document.getElementById('apikeyInput').value.trim();
-  if(!key.startsWith('sk-ant-')){
-    document.getElementById('apikeyStatus').textContent='❌ 올바른 API 키가 아니에요.';
-    document.getElementById('apikeyStatus').className='apikey-status err';
-    return;
-  }
-  localStorage.setItem('anthropic_key',key);
-  document.getElementById('apikeyStatus').textContent='✅ 저장됐어요!';
-  document.getElementById('apikeyStatus').className='apikey-status ok';
-  document.getElementById('apikeyPanel').style.borderColor='var(--sage-light)';
-}
-window.addEventListener('load',()=>{
-  const saved=localStorage.getItem('anthropic_key');
-  if(saved){
-    document.getElementById('apikeyInput').value=saved;
-    document.getElementById('apikeyStatus').textContent='✅ 저장된 API 키가 있어요.';
-    document.getElementById('apikeyStatus').className='apikey-status ok';
-    document.getElementById('apikeyPanel').style.borderColor='var(--sage-light)';
-  }
-});
 document.querySelectorAll('.cat-btn').forEach(b=>{b.addEventListener('click',()=>{const c=b.dataset.cat;if(b.classList.contains('on')){if(selCats.length===1)return;b.classList.remove('on');selCats=selCats.filter(x=>x!==c);}else{b.classList.add('on');selCats.push(c);}});});
 document.querySelectorAll('.count-dot').forEach(b=>{b.addEventListener('click',()=>{selCount=+b.dataset.n;document.querySelectorAll('.count-dot').forEach(d=>d.classList.toggle('on',+d.dataset.n<=selCount));});});
 async function generate(){
